@@ -126,7 +126,11 @@ module RBHive
     def output(sep, out_file)
       sv = self.map { |r| r.join(sep) }.join("\n")
       return sv if out_file.nil?
-      File.open(out_file, 'w') { |f| f << sv }
+      CSV.open(out_file, 'w') do |csv|
+        self.each do |s|
+          csv << s
+        end
+      end
     end
   end
 end
