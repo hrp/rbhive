@@ -71,7 +71,7 @@ module RBHive
     
     def fetch(query)
       execute(query)
-      ResultSet.new(client.fetchAll)
+      ResultSet.new(client.fetchAll, query)
     end
     
     def fetch_in_batch(query, batch_size=100)
@@ -109,7 +109,9 @@ module RBHive
   end
   
   class ResultSet < Array
-    def initialize(rows)
+    attr_reader :query
+    def initialize(rows, query=nil)
+      @query = query
       super(rows.map {|r| r.split("\t") })
     end
     
@@ -126,7 +128,7 @@ module RBHive
     def output(sep, out_file)
       sv = self.map { |r| r.join(sep) }.join("\n")
       return sv if out_file.nil?
-      CSV.open(out_file, 'w') do |csv|
+      ::CSV.open(out_file, 'w') do |csv|
         self.each do |s|
           csv << s
         end
